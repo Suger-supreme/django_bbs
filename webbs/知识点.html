@@ -1,0 +1,51 @@
+day78 2018-05-25
+
+1. 复习下分组和聚合  https://www.cnblogs.com/liwenzhou/p/8660826.html
+
+	1. 分组
+		ORM中values或者values_list 里面写什么字段，就相当于select 什么字段
+		
+		ret = models.Employee.objects.all().values("dept", "age")
+		相当于：
+		SELECT `employee`.`dept`, `employee`.`age` FROM `employee` LIMIT 21; args=()
+		
+	2. ORM中 annotate 前面是什么就按照什么分组！
+		from django.db.models import Avg
+		ret = models.Employee.objects.values("province").annotate(a=Avg("salary")).values("province", "a")
+		相当于：
+		SELECT `employee`.`province`, AVG(`employee`.`salary`) AS `a` FROM `employee` GROUP BY `employee`.`province` ORDER BY NULL LIMIT 21; args=()
+
+	3. extra  --> 在执行ORM查询的时候执行额外的SQL语句
+		# 查询person表，判断每个人的工资是否大于2000
+		ret = models.Person.objects.all().extra(
+		    select={"gt": "salary > 2000"}
+		)
+		相当于：
+		SELECT (salary > 2000) AS `gt`, `person`.`id`, `person`.`name`, `person`.`salary`, `person`.`dept_id` FROM `person` LIMIT 21; args=()
+
+
+	4. 直接执行原生的SQL语句，类似pymysql的用法
+		from django.db import connection
+		cursor = connection.cursor()  # 获取光标，等待执行SQL语句
+		cursor.execute("""SELECT * from person where id = %s""", [1])
+		row = cursor.fetchone()
+		print(row)
+		
+
+
+2. 个人站点首页
+	- 分组和聚合查询
+		1. 文章分类
+		2. 标签分类
+	
+		3. 日期归档
+			1. MySQL内置的方法：date_format(字段名, "%Y-%m")  
+			2. extra() --> 执行额外的原生SQL语句
+				ret = models.Article.objects.filter(user=user).extra(
+					select={"archive_ym": "date_format(create_time,'%%Y-%%m')"}
+				).values("archive_ym").annotate(c=Count("nid")).values("archive_ym", "c")
+			
+			    
+		
+
+

@@ -1,0 +1,20 @@
+/*个人博客主页样式*/
+.header {
+    height: 50px;
+    width: 100%;
+    color: white;
+}
+
+.header p {
+    font-size: 24px;
+    padding: 10px 0;
+    font-weight: bold;
+}
+
+.container {
+    margin-top: 50px;
+}
+
+.article-title {
+    font-size: 18px;
+}
